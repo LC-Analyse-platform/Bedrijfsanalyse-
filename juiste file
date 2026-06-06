@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <title>Voorlopige bedrijfsanalyse | LC Financiële Coaching</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style>
+    :root {
+      --blue: #01225B;
+      --red: #c00000;
+      --light: #f7f9fc;
+      --green: #16803c;
+      --orange: #d98200;
+      --grey: #555;
+      --border: #d9e1ef;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #ffffff;
+      color: var(--blue);
+      line-height: 1.5;
+    }
+
+    .tool-wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .hero {
+      background: var(--blue);
+      color: white;
+      padding: 34px 24px;
+      border-radius: 16px;
+      margin-bottom: 22px;
+      text-align: center;
+    }
+
+    .hero h1 {
+      margin: 0 0 10px;
+      font-size: 30px;
+    }
+
+    .hero p { margin: 0; font-size: 17px; }
+
+    .notice {
+      border-left: 6px solid var(--red);
+      background: #fff6f6;
+      padding: 16px;
+      border-radius: 10px;
+      margin-bottom: 22px;
+      color: #222;
+    }
+
+    .step {
+      background: var(--light);
+      padding: 22px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      margin-bottom: 18px;
+    }
+
+    .step h2 {
+      margin: 0 0 16px;
+      color: var(--blue);
+      font-size: 22px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: var(--blue);
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 11px;
+      border: 1px solid #bfc9db;
+      border-radius: 8px;
+      font-size: 15px;
+      background: #fff;
+    }
+
+    textarea { min-height: 90px; }
+
+    .checks {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 9px;
+    }
+
+    .check-item {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      font-weight: normal;
+    }
+
+    .check-item input {
+      width: auto;
+      margin-right: 8px;
+    }
+
+    .btnbar {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 24px 0;
+    }
+
+    button, .button-link {
+      background: var(--blue);
+      color: white;
+      border: 0;
+      padding: 14px 22px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      font-weight: bold;
+    }
+
+    button.secondary { background: var(--red); }
+
+    #rapport {
+      display: none;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 26px;
+      margin-top: 22px;
+      color: #111;
+    }
+
+    #rapport h2, #rapport h3 {
+      color: var(--blue);
+    }
+
+    .risk-box {
+      padding: 16px;
+      border-radius: 12px;
+      margin: 14px 0;
+      color: white;
+      font-weight: bold;
+      font-size: 20px;
+    }
+
+    .risk-green { background: var(--green); }
+    .risk-orange { background: var(--orange); }
+    .risk-red { background: var(--red); }
+
+    .score-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin: 12px 0;
+    }
+
+    .score-card {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      background: #fdfdfd;
+    }
+
+    .cta {
+      background: var(--blue);
+      color: white;
+      padding: 22px;
+      border-radius: 12px;
+      margin-top: 24px;
+    }
+
+    .cta h3 { color: white !important; margin-top: 0; }
+    .cta a {
+      background: white;
+      color: var(--blue);
+      padding: 12px 20px;
+      border-radius: 8px;
+      display: inline-block;
+      text-decoration: none;
+      font-weight: bold;
+      margin-top: 8px;
+    }
+
+    .disclaimer {
+      color: var(--grey);
+      font-size: 13px;
+      border-top: 1px solid var(--border);
+      margin-top: 18px;
+      padding-top: 14px;
+    }
+
+    @media (max-width: 760px) {
+      .grid, .grid-3, .checks, .score-grid { grid-template-columns: 1fr; }
+      .tool-wrap { padding: 14px; }
+      .hero h1 { font-size: 24px; }
+    }
+
+    @media print {
+      .no-print, form, .notice, .hero { display: none !important; }
+      #rapport { display: block !important; border: 0; }
+    }
+  </style>
+</head>
+<body>
+<div class="tool-wrap">
+
+  <div class="hero">
+    <h1>Voorlopige bedrijfsanalyse</h1>
+    <p>Herstructurering, turboliquidatie, factoring, schulden en continuïteit</p>
+  </div>
+
+  <div class="notice">
+    <strong>Let op:</strong> deze tool geeft een voorlopige signalering op basis van ingevoerde gegevens. 
+    De uitkomst is geen juridisch, fiscaal, financieel of notarieel advies.
+  </div>
+
+  <form id="toolForm">
+
+    <section class="step">
+      <h2>1. Bedrijfsgegevens</h2>
+      <div class="grid">
+        <div><label>Naam onderneming</label><input id="naam" type="text"></div>
+        <div><label>KvK-nummer</label><input id="kvk" type="text"></div>
+        <div><label>Rechtsvorm</label><select id="rechtsvorm"><option></option><option>Eenmanszaak</option><option>VOF</option><option>B.V.</option><option>Holding B.V.</option><option>Stichting</option><option>Anders</option></select></div>
+        <div><label>Vestigingsplaats</label><input id="plaats" type="text"></div>
+        <div><label>SBI-code / branche</label><input id="branche" type="text"></div>
+        <div><label>Aantal werknemers</label><input id="werknemers" type="number"></div>
+      </div>
+    </section>
+
+    <section class="step">
+      <h2>2. Wat wilt u bereiken?</h2>
+      <div class="checks">
+        <label class="check-item"><input type="checkbox" name="doel" value="Holding oprichten">Holding oprichten</label>
+        <label class="check-item"><input type="checkbox" name="doel" value="Vastgoed afscheiden">Vastgoed afscheiden</label>
+        <label class="check-item"><input type="checkbox" name="doel" value="Rekening-courant oplossen">Rekening-courant oplossen</label>
+        <label class="check-item"><input type="checkbox" name="doel" value="Liquiditeit verbeteren">Liquiditeit verbeteren</label>
+        <label class="check-item"><input type="checkbox" name="doel" value="Factoring onderzoeken">Factoring onderzoeken</label>
+        <label class="check-item"><input type="checkbox" name="doel" value="Faillissement voorkomen">Faillissement voorkomen</label>
+        <label class="check-item"><input type="checkbox" name="doel" value="Doorstart onderzoeken">Doorstart onderzoeken</label>
+        <label class="check-item"><input type="checkbox" name="doel" value="Turboliquidatie onderzoeken">Turboliquidatie onderzoeken</label>
+        <label class="check-item"><input type="checkbox" name="doel" value="Bedrijf verkopen of overdragen">Bedrijf verkopen of overdragen</label>
+        <label class="check-item"><input type="checkbox" name="doel" value="Schulden saneren">Schulden saneren</label>
+      </div>
+    </section>
+
+    <section class="step">
+      <h2>3. Aandeelhoudersstructuur</h2>
+      <div class="grid">
+        <div><label>Aandeelhouders en percentages</label><textarea id="aandeelhouders"></textarea></div>
+        <div><label>Gewenste nieuwe structuur</label><textarea id="structuur"></textarea></div>
+        <div><label>STAK/certificaten aanwezig?</label><select id="stak"><option></option><option value="ja">Ja</option><option value="nee">Nee</option></select></div>
+        <div><label>Aandeelhoudersconflict?</label><select id="conflict"><option></option><option value="ja">Ja</option><option value="nee">Nee</option></select></div>
+      </div>
+    </section>
+
+    <section class="step">
+      <h2>4. Financiële positie</h2>
+      <div class="grid-3">
+        <div><label>Omzet laatste jaar (€)</label><input id="omzet" type="number"></div>
+        <div><label>Resultaat laatste jaar (€)</label><input id="resultaat" type="number"></div>
+        <div><label>Eigen vermogen (€)</label><input id="eigenvermogen" type="number"></div>
+        <div><label>Balanstotaal (€)</label><input id="balanstotaal" type="number"></div>
+        <div><label>Vlottende activa (€)</label><input id="vlottendeactiva" type="number"></div>
+        <div><label>Kortlopende schulden (€)</label><input id="korteschulden" type="number"></div>
+        <div><label>Debiteuren (€)</label><input id="debiteuren" type="number"></div>
+        <div><label>Voorraad (€)</label><input id="voorraad" type="number"></div>
+        <div><label>Liquide middelen (€)</label><input id="liquide" type="number"></div>
+      </div>
+    </section>
+
+    <section class="step">
+      <h2>5. Schuldenpositie</h2>
+      <div class="grid-3">
+        <div><label>Belastingschuld (€)</label><input id="belasting" type="number"></div>
+        <div><label>Leveranciersachterstand (€)</label><input id="leveranciers" type="number"></div>
+        <div><label>UWV/pensioen/loonachterstand (€)</label><input id="uwv" type="number"></div>
+        <div><label>Bankleningen (€)</label><input id="banklening" type="number"></div>
+        <div><label>Leaseverplichtingen (€)</label><input id="lease" type="number"></div>
+        <div><label>Huurachterstand (€)</label><input id="huur" type="number"></div>
+      </div>
+    </section>
+
+    <section class="step">
+      <h2>6. Rekening-courant</h2>
+      <div class="grid">
+        <div><label>RC DGA/aandeelhouder (€)</label><input id="rcdga" type="number"></div>
+        <div><label>RC groepsmaatschappijen (€)</label><input id="rcgroep" type="number"></div>
+        <div><label>Aflossingsschema aanwezig?</label><select id="aflossing"><option></option><option value="ja">Ja</option><option value="nee">Nee</option></select></div>
+        <div><label>Zakelijke rente/voorwaarden vastgelegd?</label><select id="rente"><option></option><option value="ja">Ja</option><option value="nee">Nee</option></select></div>
+      </div>
+    </section>
+
+    <section class="step">
+      <h2>7. Fiscaal, vastgoed, financiering en zekerheden</h2>
+      <div class="grid">
+        <div><label>Fiscale eenheid VPB/BTW?</label><select id="fiscaleeenheid"><option></option><option value="ja">Ja</option><option value="nee">Nee</option></select></div>
+        <div><label>Fiscale verliezen aanwezig?</label><select id="verliezen"><option></option><option value="ja">Ja</option><option value="nee">Nee</option></select></div>
+        <div><label>Vastgoed aanwezig?</label><select id="vastgoed"><option></option><option value="ja">Ja</option><option value="nee">Nee</option></select></div>
+        <div><label>WOZ/marktwaarde vastgoed (€)</label><input id="vastgoedwaarde" type="number"></div>
+        <div><label>Bankfinanciering aanwezig?</label><select id="bank"><option></option><option value="ja">Ja</option><option value="nee">Nee</option></select></div>
+        <div><label>Pandrechten/hypotheek/borgstellingen?</label><select id="zekerheden"><option></option><option value="ja">Ja</option><option value="nee">Nee</option></select></div>
+        <div><label>Factoring aanwezig/gewenst?</label><select id="factoring"><option></option><option value="ja">Ja</option><option value="nee">Nee</option></select></div>
+        <div><label>Kredietverzekering aanwezig?</label><select id="kredietverzekering"><option></option><option value="ja">Ja</option><option value="nee">Nee</option></select></div>
+      </div>
+    </section>
+
+    <section class="step">
+      <h2>8. Insolventie en juridische druk</h2>
+      <div class="grid">
+        <div><label>Acute betalingsonmacht?</label><select id="betalingsonmacht"><option></option><option value="ja">Ja</option><option value="nee">Nee</option></select></div>
+        <div><label>Beslag gelegd?</label><select id="beslag"><option></option><option value="ja">Ja</option><option value="nee">Nee</option></select></div>
+        <div><label>Lopende procedure/dagvaarding?</label><select id="procedure"><option></option><option value="ja">Ja</option><option value="nee">Nee</option></select></div>
+        <div><label>Dreigende faillissementsaanvraag?</label><select id="faillissementsaanvraag"><option></option><option value="ja">Ja</option><option value="nee">Nee</option></select></div>
+      </div>
+    </section>
+
+    <section class="step">
+      <h2>9. Model turboliquidatie</h2>
+      <div class="grid">
+        <div><label>Turboliquidatie beoordelen?</label><select id="turbo"><option value="nee">Nee</option><option value="ja">Ja</option></select></div>
+        <div><label>Zijn er nog baten?</label><select id="baten"><option></option><option value="ja">Ja</option><option value="nee">Nee</option></select></div>
+        <div><label>Zijn er nog schulden?</label><select id="turboSchulden"><option></option><option value="ja">Ja</option><option value="nee">Nee</option></select></div>
+        <div><label>Administratie compleet?</label><select id="administratie"><option></option><option value="ja">Ja</option><option value="nee">Nee</option></select></div>
+        <div><label>Jaarrekeningen gedeponeerd?</label><select id="jaarrekeningen"><option></option><option value="ja">Ja</option><option value="nee">Nee</option></select></div>
+        <div><label>Activa recent verkocht/overgedragen?</label><select id="activaVerkocht"><option></option><option value="ja">Ja</option><option value="nee">Nee</option></select></div>
+        <div><label>Selectieve betalingen gedaan?</label><select id="selectief"><option></option><option value="ja">Ja</option><option value="nee">Nee</option></select></div>
+        <div><label>Werknemers aanwezig?</label><select id="turboWerknemers"><option></option><option value="ja">Ja</option><option value="nee">Nee</option></select></div>
+      </div>
+    </section>
+
+    <div class="btnbar no-print">
+      <button type="button" onclick="maakAnalyse()">Maak analyse</button>
+      <button type="button" class="secondary" onclick="downloadPDF()">Download rapport als PDF</button>
+      <a class="button-link" href="https://www.lc-financielecoaching.nl/contact" target="_blank">Neem contact op</a>
+    </div>
+  </form>
+
+  <div id="rapport"></div>
+</div>
+
+<script>
+function n(id){ return Number(document.getElementById(id).value || 0); }
+function v(id){ return document.getElementById(id).value || ""; }
+function euro(x){ return new Intl.NumberFormat('nl-NL',{style:'currency',currency:'EUR'}).format(x || 0); }
+function pct(x){ return isFinite(x) ? (x * 100).toFixed(1) + "%" : "Onbekend"; }
+
+function checkedDoelen(){
+  return Array.from(document.querySelectorAll('input[name="doel"]:checked')).map(x => x.value);
+}
+
+function addUnique(arr, item){
+  if(item && !arr.includes(item)) arr.push(item);
+}
+
+function riskLabel(score){
+  if(score >= 8) return {label:"Rood - hoog risico", cls:"risk-red", cta:"Direct handelen zonder dossieranalyse is onverstandig. Neem direct contact op met LC Financiële Coaching."};
+  if(score >= 4) return {label:"Oranje - middel risico", cls:"risk-orange", cta:"Er zijn aandachtspunten zichtbaar. Laat dit beoordelen voordat u stappen zet. Neem contact op met LC Financiële Coaching."};
+  return {label:"Groen - laag risico", cls:"risk-green", cta:"Er zijn geen directe blokkades zichtbaar, maar een definitieve beoordeling vereist controle van de stukken. Neem contact op met LC Financiële Coaching."};
+}
+
+function maakAnalyse(){
+  let doelen = checkedDoelen();
+  let juridisch=0, fiscaal=0, insolventie=0, financiering=0, aansprakelijkheid=0, pauliana=0, continuiteit=0;
+  let blokkades=[], aandacht=[], routes=[], documenten=[];
+
+  const algemeenDocs = [
+    "Recente jaarrekening", "Kolommenbalans", "Grootboek", "Crediteurenlijst", "Debiteurenlijst",
+    "Bankafschriften", "Belastingoverzicht", "Statuten", "Aandeelhoudersregister",
+    "Financieringsovereenkomsten", "Pandakten / borgstellingen / hypotheekakten",
+    "Specificatie rekening-courant", "Overzicht lopende procedures of beslagen"
+  ];
+  algemeenDocs.forEach(x => addUnique(documenten,x));
+
+  let solvabiliteit = n("balanstotaal") ? n("eigenvermogen") / n("balanstotaal") : NaN;
+  let currentRatio = n("korteschulden") ? n("vlottendeactiva") / n("korteschulden") : NaN;
+  let quickRatio = n("korteschulden") ? (n("vlottendeactiva") - n("voorraad")) / n("korteschulden") : NaN;
+  let werkkapitaal = n("vlottendeactiva") - n("korteschulden");
+
+  if(n("eigenvermogen") < 0){ continuiteit+=3; aansprakelijkheid+=1; addUnique(blokkades,"Negatief eigen vermogen: continuïteit en balanspositie eerst beoordelen."); addUnique(routes,"Kapitaalstorting, agiostorting, schuldconversie of balansherstructurering onderzoeken."); }
+  if(currentRatio && currentRatio < 1){ continuiteit+=2; financiering+=1; addUnique(aandacht,"Current ratio lager dan 1: korte termijn liquiditeitsdruk zichtbaar."); addUnique(routes,"Liquiditeitsprognose, factoring of crediteurenstrategie onderzoeken."); }
+  if(n("belasting") > 0){ fiscaal+=2; insolventie+=2; aansprakelijkheid+=2; addUnique(aandacht,"Belastingschuld aanwezig: invordering, betalingsregeling, sanering en aansprakelijkheidsrisico beoordelen."); addUnique(routes,"Betalingsregeling of saneringsvoorstel Belastingdienst onderzoeken."); addUnique(documenten,"Specificatie openstaande belastingaanslagen en betalingsregeling"); }
+  if(n("belasting") > 50000){ fiscaal+=2; insolventie+=1; addUnique(blokkades,"Belastingschuld boven € 50.000: structuurwijziging zonder invorderingsanalyse is risicovol."); }
+  if(n("leveranciers") > 0){ insolventie+=1; continuiteit+=1; addUnique(aandacht,"Leveranciersachterstand aanwezig: crediteurenaanpak beoordelen."); addUnique(routes,"Minnelijk akkoord of betalingsregeling met leveranciers onderzoeken."); }
+  if(n("uwv") > 0){ insolventie+=2; aansprakelijkheid+=2; addUnique(aandacht,"UWV-, pensioen- of loonachterstanden verhogen het insolventie- en aansprakelijkheidsrisico."); addUnique(routes,"Preferente schulden en personeelspositie eerst beoordelen."); addUnique(documenten,"Loonadministratie, pensioenoverzicht en UWV-specificatie"); }
+  if(n("rcdga") > 0){ fiscaal+=2; juridisch+=1; addUnique(aandacht,"Rekening-courant DGA/aandeelhouder aanwezig: fiscale en civielrechtelijke behandeling beoordelen."); addUnique(routes,"Aflossingsschema, omzetting in lening, agio of kapitaalstorting onderzoeken."); }
+  if(n("rcdga") > 100000){ fiscaal+=2; addUnique(blokkades,"RC DGA/aandeelhouder boven € 100.000: afzonderlijke rekening-courantanalyse noodzakelijk."); }
+  if(v("aflossing")==="nee" && n("rcdga")>0){ fiscaal+=1; addUnique(aandacht,"Geen aflossingsschema bij RC: zakelijkheid en verhaalbaarheid beoordelen."); }
+  if(v("rente")==="nee" && n("rcdga")>0){ fiscaal+=1; addUnique(aandacht,"Geen zakelijke rente/voorwaarden bij RC: fiscaal risico signaleren."); }
+  if(v("vastgoed")==="ja"){ fiscaal+=3; juridisch+=2; financiering+=1; addUnique(aandacht,"Vastgoed aanwezig: overdrachtsbelasting, financieringsvoorwaarden en zakelijke motieven beoordelen."); addUnique(routes,"Vastgoedholding, juridische splitsing of gecontroleerde vastgoedafscheiding onderzoeken."); addUnique(documenten,"Vastgoedstukken, WOZ-beschikking, taxatie en hypotheekakte"); }
+  if(v("fiscaleeenheid")==="ja"){ fiscaal+=2; addUnique(aandacht,"Fiscale eenheid VPB/BTW aanwezig: verbreking of wijziging kan fiscale gevolgen hebben."); addUnique(routes,"Vooraf fiscale analyse VPB/BTW laten uitvoeren."); }
+  if(v("verliezen")==="ja"){ fiscaal+=1; addUnique(aandacht,"Fiscale verliezen aanwezig: verliesverrekening en mogelijke beperkingen beoordelen."); }
+  if(v("bank")==="ja"){ financiering+=2; addUnique(aandacht,"Bankfinanciering aanwezig: toestemming financier en convenanten controleren."); addUnique(routes,"Afstemming met bank of herfinanciering onderzoeken."); }
+  if(v("zekerheden")==="ja"){ juridisch+=2; financiering+=2; addUnique(aandacht,"Pandrechten, hypotheekrechten of borgstellingen aanwezig: zekerhedenpositie eerst beoordelen."); }
+  if(v("factoring")==="ja" || doelen.includes("Factoring onderzoeken") || doelen.includes("Liquiditeit verbeteren")){ addUnique(routes,"Factoring of debiteurenfinanciering onderzoeken om liquiditeit te verbeteren."); addUnique(documenten,"Debiteurenlijst, omzetoverzicht en ouderdomsanalyse debiteuren"); }
+  if(v("conflict")==="ja"){ juridisch+=2; addUnique(aandacht,"Aandeelhoudersconflict aanwezig: besluitvorming, bevoegdheden en aandeelhoudersovereenkomst controleren."); addUnique(documenten,"Aandeelhoudersovereenkomst en AVA-besluiten"); }
+  if(v("beslag")==="ja"){ juridisch+=3; insolventie+=2; pauliana+=2; addUnique(blokkades,"Beslag aanwezig: herstructurering kan juridisch betwistbaar zijn."); addUnique(routes,"Eerst beslagpositie, verhaalsrisico en processtrategie beoordelen."); addUnique(documenten,"Beslagstukken en correspondentie deurwaarder"); }
+  if(v("procedure")==="ja"){ juridisch+=2; insolventie+=1; addUnique(aandacht,"Lopende procedure/dagvaarding aanwezig: procesrisico meenemen in elke route."); addUnique(documenten,"Dagvaarding, processtukken en correspondentie advocaat"); }
+  if(v("faillissementsaanvraag")==="ja"){ insolventie+=4; aansprakelijkheid+=2; addUnique(blokkades,"Dreigende faillissementsaanvraag: stabilisatie en bestuurderspositie direct beoordelen."); addUnique(routes,"Stabilisatieplan, crediteurenakkoord, sanering of gecontroleerde doorstart onderzoeken."); }
+  if(v("betalingsonmacht")==="ja"){ insolventie+=4; continuiteit+=3; aansprakelijkheid+=2; addUnique(blokkades,"Acute betalingsonmacht: directe structuurwijziging zonder dossieranalyse is onverstandig."); addUnique(routes,"Liquiditeitsprognose, stabilisatieplan, factoring, crediteurenstrategie of doorstartscenario onderzoeken."); }
+
+  doelen.forEach(d => {
+    if(d==="Holding oprichten") addUnique(routes,"Holdingstructuur onderzoeken voor risicospreiding, verkoopvoorbereiding en deelnemingen.");
+    if(d==="Vastgoed afscheiden") addUnique(routes,"Vastgoedafscheiding alleen onderzoeken na fiscale, financierings- en schuldeiserstoets.");
+    if(d==="Faillissement voorkomen") addUnique(routes,"Faillissementspreventie: liquiditeit, crediteuren, Belastingdienst en zekerhedenpositie integraal beoordelen.");
+    if(d==="Doorstart onderzoeken") addUnique(routes,"Doorstartscenario onderzoeken inclusief activa/passiva, personeel, contracten en aansprakelijkheidsrisico.");
+    if(d==="Bedrijf verkopen of overdragen") addUnique(routes,"Verkoopklaar maken: schulden, RC, zekerheden, fiscaliteit en structuur opschonen.");
+    if(d==="Schulden saneren") addUnique(routes,"Schuldenregeling of saneringsvoorstel voorbereiden op basis van actuele crediteurenpositie.");
+  });
+
+  let turboHtml = "";
+  if(v("turbo")==="ja" || doelen.includes("Turboliquidatie onderzoeken")){
+    addUnique(documenten,"Balans per ontbindingsdatum");
+    addUnique(documenten,"Staat van baten en lasten");
+    addUnique(documenten,"Toelichting ontbreken baten");
+    addUnique(documenten,"Aandeelhoudersbesluit ontbinding");
+    addUnique(documenten,"Bestuursverklaring");
+    addUnique(documenten,"Overzicht betalingen laatste 12 maanden");
+    if(v("baten")==="ja"){ juridisch+=4; fiscaal+=1; addUnique(blokkades,"Turboliquidatie: er zijn nog baten. Reguliere vereffening of activa-afwikkeling beoordelen."); addUnique(routes,"Reguliere vereffening of eerst activa liquideren onderzoeken."); }
+    if(v("turboSchulden")==="ja" && v("baten")==="nee"){ juridisch+=2; aansprakelijkheid+=2; addUnique(aandacht,"Turboliquidatie met schulden zonder baten: transparantieverplichtingen en schuldeiserspositie voorbereiden."); }
+    if(v("administratie")==="nee"){ aansprakelijkheid+=3; juridisch+=2; addUnique(blokkades,"Turboliquidatie: administratie niet compleet. Bestuurdersrisico verhoogd."); }
+    if(v("jaarrekeningen")==="nee"){ aansprakelijkheid+=2; addUnique(aandacht,"Ontbrekende jaarrekeningen: verhoogd risico op discussie over bestuurdersaansprakelijkheid."); }
+    if(v("activaVerkocht")==="ja"){ pauliana+=3; juridisch+=2; addUnique(blokkades,"Recente activatransacties: paulianarisico of benadeling schuldeisers beoordelen."); }
+    if(v("selectief")==="ja"){ pauliana+=3; aansprakelijkheid+=2; addUnique(blokkades,"Selectieve betalingen: risico op benadeling schuldeisers en aansprakelijkheidsdiscussie."); }
+    if(v("turboWerknemers")==="ja"){ juridisch+=2; insolventie+=2; addUnique(blokkades,"Werknemers aanwezig: arbeidsrechtelijke beëindiging en loonverplichtingen eerst beoordelen."); }
+
+    turboHtml += "<h3>Turboliquidatiebeoordeling</h3>";
+    turboHtml += "<p>Deze module is geactiveerd. De uitkomst is uitsluitend een voorlopige signalering.</p>";
+  }
+
+  let total = juridisch+fiscaal+insolventie+financiering+aansprakelijkheid+pauliana+continuiteit;
+  let overall = riskLabel(total >= 22 ? 8 : total >= 10 ? 4 : 0);
+
+  let conclusie = overall.cta;
+  if(total >= 22) conclusie = "Directe uitvoering van herstructurering, turboliquidatie of doorstart zonder dossieranalyse is onverstandig. " + overall.cta;
+  if(total >= 10 && total < 22) conclusie = "Er zijn relevante fiscale, juridische, financiële of insolventierechtelijke aandachtspunten zichtbaar. " + overall.cta;
+
+  let scoreCards = [
+    ["Juridisch risico", juridisch], ["Fiscaal risico", fiscaal], ["Insolventierisico", insolventie],
+    ["Financieringsrisico", financiering], ["Bestuurdersaansprakelijkheid", aansprakelijkheid],
+    ["Paulianarisico", pauliana], ["Continuïteitsrisico", continuiteit]
+  ].map(([name,score]) => {
+    let r = riskLabel(score);
+    return "<div class='score-card'><strong>"+name+"</strong><br>"+r.label+"<br>Score: "+score+"</div>";
+  }).join("");
+
+  let html = "";
+  html += "<h2>Voorlopige bedrijfsanalyse</h2>";
+  html += "<p><strong>LC Financiële Coaching</strong></p>";
+  html += "<p><strong>Datum analyse:</strong> " + new Date().toLocaleDateString('nl-NL') + "</p>";
+  html += "<p><strong>Onderneming:</strong> " + v("naam") + "</p>";
+  html += "<p><strong>KvK:</strong> " + v("kvk") + "</p>";
+  html += "<p><strong>Rechtsvorm:</strong> " + v("rechtsvorm") + "</p>";
+  html += "<p><strong>Doel ondernemer:</strong> " + (doelen.join(", ") || "Niet ingevuld") + "</p>";
+
+  html += "<div class='risk-box "+overall.cls+"'>" + overall.label + " | totaalscore: " + total + "</div>";
+
+  html += "<h3>Belangrijkste conclusie</h3><p>" + conclusie + "</p>";
+
+  html += "<h3>Financiële kengetallen</h3>";
+  html += "<ul>";
+  html += "<li>Omzet laatste jaar: " + euro(n("omzet")) + "</li>";
+  html += "<li>Resultaat laatste jaar: " + euro(n("resultaat")) + "</li>";
+  html += "<li>Eigen vermogen: " + euro(n("eigenvermogen")) + "</li>";
+  html += "<li>Solvabiliteit: " + pct(solvabiliteit) + "</li>";
+  html += "<li>Current ratio: " + (isFinite(currentRatio) ? currentRatio.toFixed(2) : "Onbekend") + "</li>";
+  html += "<li>Quick ratio: " + (isFinite(quickRatio) ? quickRatio.toFixed(2) : "Onbekend") + "</li>";
+  html += "<li>Werkkapitaal: " + euro(werkkapitaal) + "</li>";
+  html += "</ul>";
+
+  html += "<h3>Risicoscores per categorie</h3><div class='score-grid'>" + scoreCards + "</div>";
+
+  if(blokkades.length){ html += "<h3>Blokkades / zware aandachtspunten</h3><ul>" + blokkades.map(x=>"<li>"+x+"</li>").join("") + "</ul>"; }
+  if(aandacht.length){ html += "<h3>Aandachtspunten</h3><ul>" + aandacht.map(x=>"<li>"+x+"</li>").join("") + "</ul>"; }
+
+  html += turboHtml;
+
+  html += "<h3>Mogelijke oplossingsrichtingen</h3><ul>";
+  (routes.length ? routes : ["Structuuranalyse, fiscale toetsing en juridische beoordeling uitvoeren voordat een keuze wordt gemaakt."]).forEach(x => html += "<li>"+x+"</li>");
+  html += "</ul>";
+
+  html += "<h3>Benodigde documenten</h3><ul>" + documenten.map(x=>"<li>"+x+"</li>").join("") + "</ul>";
+
+  html += "<div class='cta'><h3>Neem contact op</h3>";
+  html += "<p>Wilt u weten welke oplossing verantwoord past bij uw onderneming? Neem contact op met LC Financiële Coaching voor een persoonlijke beoordeling van uw situatie.</p>";
+  html += "<a href='https://www.lc-financielecoaching.nl/contact' target='_blank'>Neem contact op</a></div>";
+
+  html += "<div class='disclaimer'><strong>Disclaimer</strong><br>";
+  html += "Deze uitkomst is uitsluitend een voorlopige signalering op basis van de door de gebruiker ingevoerde gegevens. De tool geeft geen juridisch, fiscaal, financieel of notarieel advies. Er wordt geen definitief oordeel gegeven over de haalbaarheid, rechtmatigheid of fiscale toelaatbaarheid van een herstructurering, turboliquidatie, doorstart, schuldsanering, factoring of andere oplossingsrichting. Definitieve beoordeling vereist onderzoek van onder meer statuten, jaarrekeningen, aandeelhoudersregister, fiscale positie, financieringsdocumentatie, zekerheden, schuldenpositie, rekening-courantverhoudingen, administratie, contracten en overige relevante stukken.";
+  html += "<br><br><strong>Neem contact op met LC Financiële Coaching voor een persoonlijke beoordeling van uw situatie.</strong></div>";
+
+  document.getElementById("rapport").innerHTML = html;
+  document.getElementById("rapport").style.display = "block";
+  document.getElementById("rapport").scrollIntoView({behavior:"smooth"});
+}
+
+async function downloadPDF(){
+  if(document.getElementById("rapport").style.display === "none" || !document.getElementById("rapport").innerHTML.trim()){
+    maakAnalyse();
+  }
+  const { jsPDF } = window.jspdf;
+  const element = document.getElementById("rapport");
+  const canvas = await html2canvas(element, {scale: 2, useCORS: true});
+  const imgData = canvas.toDataURL("image/png");
+  const pdf = new jsPDF("p", "mm", "a4");
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const imgWidth = pageWidth;
+  const imgHeight = canvas.height * imgWidth / canvas.width;
+  let heightLeft = imgHeight;
+  let position = 0;
+
+  pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+  heightLeft -= pageHeight;
+
+  while (heightLeft > 0) {
+    position = heightLeft - imgHeight;
+    pdf.addPage();
+    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+  }
+
+  const naam = (v("naam") || "bedrijfsanalyse").replace(/[^a-z0-9-_]/gi, "_");
+  pdf.save("Voorlopige_bedrijfsanalyse_" + naam + ".pdf");
+}
+</script>
+</body>
+</html>
